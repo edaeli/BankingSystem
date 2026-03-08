@@ -10,8 +10,10 @@
 #include <pthread.h>
 #include <iostream>
 
+#define SHM_NAME "/shlor"
+
 struct Account {
-	int balance = 0 ;
+	int balance = 0;
  	int min_balance = 0;
  	int max_balance = 2147364847;
  	bool frozen = 0;
@@ -19,7 +21,9 @@ struct Account {
 
 struct Bank {
 	int N;
+	pthread_mutex_t mutex;
  	Account accounts[];
 };
 
 #endif
+
