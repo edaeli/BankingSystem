@@ -37,8 +37,8 @@ int main(int argc,char *argv[]){
 
     	for (int i = 0; i < N; i++) {
         	bank->accounts[i].balance = 0;
-        	bank->accounts[i].min_balance = 0;
-        	bank->accounts[i].max_balance = 1000000;
+        	bank->accounts[i].min_balance = -100;
+        	bank->accounts[i].max_balance = 10000;
         	bank->accounts[i].frozen = false;
     	}
 

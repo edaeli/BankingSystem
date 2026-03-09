@@ -14,8 +14,8 @@
 
 struct Account {
 	int balance = 0;
- 	int min_balance = 0;
- 	int max_balance = 2147364847;
+ 	int min_balance = -100;
+ 	int max_balance = 10000;
  	bool frozen = 0;
 };
 
