@@ -161,6 +161,118 @@ int main(){
 
 		}
 
+		else if (cmd == "addall"){
+
+    			int X;
+    			std::cin >> X;
+
+   			pthread_mutex_lock(&bank->mutex);
+
+    			for (int i = 0; i < bank->N; i++){
+
+        			if (bank->accounts[i].frozen){
+            				std::cout << "Account " << i << " is frozen\n";
+            				continue;
+        			}
+
+        			if (bank->accounts[i].balance + X > bank->accounts[i].max_balance){
+            				std::cout << "Account " << i << " exceeds max balance\n";
+            				continue;
+        			}
+
+        			bank->accounts[i].balance += X;
+    			}
+
+    			std::cout << "Added " << X << " to all accounts\n";
+
+    			pthread_mutex_unlock(&bank->mutex);
+		}
+
+		else if (cmd == "suball"){
+
+                        int X;
+                        std::cin >> X;
+
+                        pthread_mutex_lock(&bank->mutex);
+
+                        for (int i = 0; i < bank->N; i++){
+
+                                if (bank->accounts[i].frozen){
+                                        std::cout << "Account " << i << " is frozen\n";
+                                        continue;
+                                }
+
+                                if (bank->accounts[i].balance - X < bank->accounts[i].min_balance){
+                                        std::cout << "Account " << i << " violates min balance\n";
+                                        continue;
+                                }
+
+                                bank->accounts[i].balance -= X;
+                        }
+
+                        std::cout << "Subed " << X << " to all accounts\n";
+
+                        pthread_mutex_unlock(&bank->mutex);
+                }
+
+		else if (cmd == "setmin"){
+
+    			int A, X;
+    			std::cin >> A >> X;
+
+    			if (A < 0 || A >= bank->N){
+        			std::cout << "Invalid account\n";
+        			continue;
+    			}
+
+    			pthread_mutex_lock(&bank->mutex);
+
+    			if (X > bank->accounts[A].balance){
+        			std::cout << "New min greater than current balance\n";
+        			pthread_mutex_unlock(&bank->mutex);
+        			continue;
+    			}
+
+    			bank->accounts[A].min_balance = X;
+
+    			std::cout << "Min balance of account " << A << " set to " << X << "\n";
+
+    			pthread_mutex_unlock(&bank->mutex);
+
+		}
+
+		else if (cmd == "setmax"){
+
+                        int A, X;
+                        std::cin >> A >> X;
+
+                        if (A < 0 || A >= bank->N){
+                                std::cout << "Invalid account\n";
+                                continue;
+                        }
+
+                        pthread_mutex_lock(&bank->mutex);
+
+                        if (X < bank->accounts[A].balance){
+                                std::cout << "New max less than current balance\n";
+                                pthread_mutex_unlock(&bank->mutex);
+                                continue;
+                        }
+
+                        bank->accounts[A].max_balance = X;
+
+                        std::cout << "Max balance of account " << A << " set to " << X << "\n";
+
+                        pthread_mutex_unlock(&bank->mutex);
+
+                }
+
+
+		else {
+			std::cout << "Invalid command\n";
+			continue;	
+		}
+
 	}
 
 	return 0;
