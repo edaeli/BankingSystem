@@ -117,12 +117,20 @@ int main(){
 		
 		else if (cmd == "transfer"){
 			int A, B, X;
-			std::cin >> A >> B >> X;
+			std::cin >> A >> B;
 
 			if(A < 0 || A >= bank->N || B < 0 || B >= bank->N){
 				std::cout << "Invalid account\n";
 				continue;
 			}
+
+			if (!(std::cin >> X)){
+    				std::cout << "Invalid amount\n";
+    				std::cin.clear();               
+    				std::cin.ignore(1000, '\n'); 
+    				continue;
+			}
+
 
 			if(X < 0){
 				std::cout << "Invalid amount\n";
@@ -164,7 +172,14 @@ int main(){
 		else if (cmd == "addall"){
 
     			int X;
-    			std::cin >> X;
+
+			if (!(std::cin >> X)){
+                                std::cout << "Invalid amount\n";
+                                std::cin.clear();
+                                std::cin.ignore(1000, '\n');
+                                continue;
+                        }
+
 
    			pthread_mutex_lock(&bank->mutex);
 
@@ -191,7 +206,14 @@ int main(){
 		else if (cmd == "suball"){
 
                         int X;
-                        std::cin >> X;
+
+			if (!(std::cin >> X)){
+                                std::cout << "Invalid amount\n";
+                                std::cin.clear();
+                                std::cin.ignore(1000, '\n');
+                                continue;
+                        }
+
 
                         pthread_mutex_lock(&bank->mutex);
 
@@ -218,12 +240,20 @@ int main(){
 		else if (cmd == "setmin"){
 
     			int A, X;
-    			std::cin >> A >> X;
+    			std::cin >> A;
 
     			if (A < 0 || A >= bank->N){
         			std::cout << "Invalid account\n";
         			continue;
     			}
+
+			if (!(std::cin >> X)){
+                                std::cout << "Invalid amount\n";
+                                std::cin.clear();
+                                std::cin.ignore(1000, '\n');
+                                continue;
+                        }
+
 
     			pthread_mutex_lock(&bank->mutex);
 
@@ -244,12 +274,21 @@ int main(){
 		else if (cmd == "setmax"){
 
                         int A, X;
-                        std::cin >> A >> X;
+                        std::cin >> A;
+
 
                         if (A < 0 || A >= bank->N){
                                 std::cout << "Invalid account\n";
                                 continue;
                         }
+			
+			if (!(std::cin >> X)){
+                                std::cout << "Invalid amount\n";
+                                std::cin.clear();
+                                std::cin.ignore(1000, '\n');
+                                continue;
+                        }
+
 
                         pthread_mutex_lock(&bank->mutex);
 
@@ -267,6 +306,27 @@ int main(){
 
                 }
 
+		
+		else if (cmd == "help"){
+            		std::cout << "Available commands:\n"
+                      << "balance A      - show current balance of account A\n"
+                      << "min A          - show min allowed balance of account A\n"
+                      << "max A          - show max allowed balance of account A\n"
+                      << "freeze A       - freeze account A\n"
+                      << "unfreeze A     - unfreeze account A\n"
+                      << "transfer A B X - transfer X units from A to B\n"
+                      << "addall X       - add X units to all accounts\n"
+                      << "suball X       - subtract X units from all accounts\n"
+                      << "setmin A X     - set min balance of account A to X\n"
+                      << "setmax A X     - set max balance of account A to X\n"
+                      << "exit           - exit client\n"
+                      << "help           - show this message\n";
+        	}
+
+        	else if (cmd == "exit"){
+            		std::cout << "Exiting client.\n";
+            		break;
+        	}
 
 		else {
 			std::cout << "Invalid command\n";
