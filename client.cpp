@@ -232,7 +232,7 @@ int main(){
                                 bank->accounts[i].balance -= X;
                         }
 
-                        std::cout << "Subed " << X << " to all accounts\n";
+                        std::cout << "Subbed " << X << " to all accounts\n";
 
                         pthread_mutex_unlock(&bank->mutex);
                 }

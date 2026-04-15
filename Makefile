@@ -1,29 +1,54 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -pthread
+CXXFLAGS = -std=c++11 -Wall -pthread
+LDFLAGS = -lrt
 
-all: init destroy client
+# Флаги для разных сборок
+RELEASE_FLAGS = -O3
+DEBUG_FLAGS = -g -O0
+COVERAGE_FLAGS = -fprofile-arcs -ftest-coverage
 
-init: init.o
-	$(CXX) init.o -o init $(CXXFLAGS)
+TARGETS = init destroy server client_online
 
-destroy: destroy.o
-	$(CXX) destroy.o -o destroy
+.PHONY: all clean release debug coverage test_valgrind
 
-client: client.o shm.o
-	$(CXX) client.o shm.o -o client $(CXXFLAGS)
+all: release
 
-init.o: init.cpp bank.h
-	$(CXX) $(CXXFLAGS) -c init.cpp
+# Сборка без отладочной информации
+release: CXXFLAGS += $(RELEASE_FLAGS)
+release: $(TARGETS)
 
-destroy.o: destroy.cpp bank.h
-	$(CXX) $(CXXFLAGS) -c destroy.cpp
+# Сборка для отладки
+debug: CXXFLAGS += $(DEBUG_FLAGS)
+debug: $(TARGETS)
 
-client.o: client.cpp bank.h
-	$(CXX) $(CXXFLAGS) -c client.cpp
+# Сборка для измерения покрытия
+coverage: CXXFLAGS += $(DEBUG_FLAGS) $(COVERAGE_FLAGS)
+coverage: LDFLAGS += --coverage
+coverage: clean $(TARGETS)
 
-shm.o: shm.cpp bank.h
-	$(CXX) $(CXXFLAGS) -c shm.cpp
+# Правила для объектных файлов (каждый модуль отдельно)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Сборка исполняемых файлов
+init: init.o shm.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+destroy: destroy.o shm.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+server: server.o commands.o shm.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+client_online: client_online.o
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+# Запуск тестов под Valgrind (memcheck и helgrind)
+test_valgrind: debug
+	@echo "Running Valgrind memcheck on server..."
+	valgrind --tool=memcheck --leak-check=full --error-exitcode=1 ./server & sleep 2 && (echo "balance 0" | ./client_online 127.0.0.1 8080) && (echo "shutdown" | ./client_online 127.0.0.1 8080)
+	@echo "Running Valgrind helgrind on server..."
+	valgrind --tool=helgrind ./server & sleep 2 && (echo "balance 0" | ./client_online 127.0.0.1 8080) && (echo "shutdown" | ./client_online 127.0.0.1 8080)
 
 clean:
-	rm -f *.o init destroy client
-
+	rm -f *.o $(TARGETS) *.gcno *.gcda *.gcov

@@ -1,0 +1,29 @@
+balance 0
+min 0
+max 0
+
+addall 100
+balance 0
+balance 1
+
+transfer 0 1 50
+balance 0
+balance 1
+
+freeze 1
+transfer 0 1 10
+unfreeze 1
+
+suball 30
+balance 0
+balance 1
+
+setmax 0 40
+transfer 1 0 100
+
+setmin 1 -200
+transfer 0 1 20
+
+balance 0
+balance 1
+

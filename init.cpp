@@ -17,7 +17,11 @@ int main(int argc,char *argv[]){
 
  	int size = N * sizeof(Account) + sizeof(Bank);
 
- 	ftruncate(shm_fd, size);
+ 	if(ftruncate(shm_fd, size) == -1){
+		perror("ftruncate");
+		return 1;
+	}
+
 
  	auto *bank = (Bank*)mmap(nullptr,size,PROT_READ | PROT_WRITE,MAP_SHARED, shm_fd,0);
 
