@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <regex>
 
 class Painter {
     std::ostream& out;
@@ -15,20 +16,16 @@ public:
         : out(os), green_words(g), red_words(r) {}
 
     void print(std::string text) {
-        for (const auto& word : green_words) {
-            size_t pos = 0;
-            while ((pos = text.find(word, pos)) != std::string::npos) {
-                text.replace(pos, word.length(), "\033[32m" + word + "\033[0m");
-                pos += 13; 
-            }
+	for (const auto& word : green_words) {
+            std::regex reg("\\b" + word + "\\b");
+            text = std::regex_replace(text, reg, "\033[32m" + word + "\033[0m");
         }
+        
         for (const auto& word : red_words) {
-            size_t pos = 0;
-            while ((pos = text.find(word, pos)) != std::string::npos) {
-                text.replace(pos, word.length(), "\033[31m" + word + "\033[0m");
-                pos += 13;
-            }
+            std::regex reg("\\b" + word + "\\b");
+            text = std::regex_replace(text, reg, "\033[31m" + word + "\033[0m");
         }
+        
         out << text;
     }
 };
