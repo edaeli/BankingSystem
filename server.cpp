@@ -10,14 +10,14 @@
 
 extern Bank* bank_attach(int& shm_fd);
 
-// Глобальные переменные для синхронизации статистики
+
 int total_requests = 0;
 pthread_mutex_t stats_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t stats_cond = PTHREAD_COND_INITIALIZER;
 bool server_running = true;
 Bank* shared_bank = nullptr;
 
-// Нить для вывода статистики (каждые 5 запросов)
+
 void* stats_thread_routine(void* arg) {
     pthread_mutex_lock(&stats_mutex);
     while (server_running) {
@@ -30,7 +30,6 @@ void* stats_thread_routine(void* arg) {
     return nullptr;
 }
 
-// Структура для передачи данных в нить клиента
 struct ClientInfo {
     int fd;
 };
@@ -49,10 +48,9 @@ void* client_thread_routine(void* arg) {
         	std::string request(buffer);
         	bool shutdown_requested = false;
         
-        	// Обработка команды через твой commands.cpp
+       
         	std::string response = process_command(shared_bank, request, shutdown_requested);
 
-        	// Обновляем статистику
         	pthread_mutex_lock(&stats_mutex);
         	total_requests++;
         	pthread_cond_signal(&stats_cond);
@@ -63,7 +61,7 @@ void* client_thread_routine(void* arg) {
         	if (shutdown_requested) {
             		server_running = false;
             		std::cout << "Shutdown command received. Closing server...\n";
-            		exit(0); // В учебных целях завершаем весь процесс
+            		exit(0); 
         	}
     	}
     	close(client_fd);
